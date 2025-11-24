@@ -1,1 +1,1124 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>মাই নেটওয়ার্ক - ড্যাশবোর্ড</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bangla:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root{--bg:#f3e9f0;--card-shadow:0 8px 0 rgba(0,0,0,0.06),0 6px 18px rgba(0,0,0,0.08);--accent:#d32f2f;}
+    *{box-sizing:border-box}
+    body{font-family:'Noto Sans Bangla',sans-serif;margin:0;background:linear-gradient(180deg,#fffbff,#f3e9f0);min-height:100vh;}
+    .topbar{background:#000;padding:6px 12px;color:#fff;display:flex;align-items:center;justify-content:center;position:sticky;top:0;z-index:30}
+    .support-btn{background:var(--accent);color:#fff;padding:8px 14px;border-radius:6px;text-decoration:none;font-weight:700}
+    header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px}
+    .logo{display:flex;align-items:center;gap:10px}
+    .logo .mark{width:36px;height:36px;border-radius:8px;background:#2e7d32;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+    .hamburger{width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:6px;cursor:pointer;font-size:20px}
+    .container{padding:12px}
+    .notice{background:#39a56a;color:#fff;padding:22px;border-radius:12px;text-align:center;box-shadow:var(--card-shadow);margin-bottom:16px}
+    .notice h2{margin:0 0 8px;font-size:22px}
+    .btn-red{background:#ff0000;color:#fff;border:none;padding:10px 18px;border-radius:8px;font-weight:700;cursor:pointer}
+    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+    .card{background:#fff;padding:18px;border-radius:12px;box-shadow:var(--card-shadow);display:flex;flex-direction:column;gap:6px;min-height:110px}
+    /* Drawer */
+    .drawer{position:fixed;top:0;left:-260px;width:260px;height:100%;background:#fff;box-shadow:2px 0 10px rgba(0,0,0,0.2);transition:left 0.3s ease;z-index:1000;padding:20px;overflow:auto;}
+    .drawer.open{left:0;}
+    .drawer a{display:block;padding:10px 0;text-decoration:none;color:#000;font-weight:600;border-bottom:1px solid #ddd;cursor:pointer;}
+    .overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);display:none;z-index:900;}
+    .overlay.show{display:block;}
 
+    /* Modal */
+    .modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:2000;}
+    .modal.show{display:flex;}
+    .modal-content{background:#fff;padding:20px;border-radius:12px;max-width:400px;width:90%;box-shadow:0 6px 18px rgba(0,0,0,0.3);text-align:center}
+    .grid-pay{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:10px}
+    .pay-btn{background:#f8f8f8;border-radius:10px;box-shadow:0 3px 8px rgba(0,0,0,0.1);padding:16px;font-weight:700;cursor:pointer;transition:0.2s;}
+    .pay-btn:hover{background:#ececec}
+    .pay-now{margin-top:15px;background:#d32f2f;color:#fff;padding:10px;border-radius:50px;border:none;font-size:18px;font-weight:700;width:100%;cursor:pointer}
+
+    /* Notice */
+    #modalNotice{background:#ffe082;color:#000;padding:10px;border-radius:8px;margin-bottom:10px;display:none;font-weight:700;text-align:center;}
+    #noticeButtons{margin-top:10px;display:none;}
+
+    /* Transaction Modal */
+    #transactionModal .modal-content{text-align:left}
+    .form-group{margin:12px 0}
+    .form-group label{font-weight:600;display:block;margin-bottom:6px}
+    .form-group input, .form-group select{width:100%;padding:10px;border:1px solid #ccc;border-radius:6px}
+    .copy-btn{margin-left:10px;padding:6px 10px;border:none;background:#4caf50;color:#fff;border-radius:6px;cursor:pointer}
+    .verify-btn{background:#2e7d32;color:#fff;padding:10px;width:100%;border:none;border-radius:8px;font-weight:700;margin-top:10px;cursor:pointer}
+    .cancel-btn{background:#f44336;color:#fff;padding:10px;width:100%;border:none;border-radius:8px;font-weight:700;margin-top:10px;cursor:pointer}
+
+    /* Work List Modal */
+    #workListModal ul{list-style:none;padding:0;margin:0;text-align:left}
+    #workListModal li{padding:8px 0;border-bottom:1px solid #ddd;font-weight:600}
+
+    /* Refer Code Modal */
+    #referCodeModal .modal-content{text-align:left}
+
+    /* Auth Modals */
+    #authModal .modal-content{text-align:left}
+    .auth-tabs{display:flex;border-bottom:1px solid #ddd;margin-bottom:15px}
+    .auth-tab{flex:1;text-align:center;padding:10px;cursor:pointer;font-weight:600}
+    .auth-tab.active{background:#f0f0f0;border-bottom:2px solid #d32f2f}
+    .auth-form{display:none}
+    .auth-form.active{display:block}
+    .toggle-auth{color:#d32f2f;cursor:pointer;text-align:center;margin-top:15px;font-weight:600}
+
+    /* Toast Top Right */
+    .toast{visibility:hidden;min-width:250px;background:#333;color:#fff;text-align:center;border-radius:8px;padding:12px;position:fixed;top:20px;right:20px;z-index:3000;font-weight:600;opacity:0;transition:opacity 0.5s, top 0.5s;}
+    .toast.show{visibility:visible;opacity:1;top:50px;}
+
+    /* User Info in Drawer */
+    .user-drawer-info{background:#f5f5f5;padding:15px;border-radius:8px;margin-bottom:15px;text-align:center;}
+    .user-avatar{width:50px;height:50px;border-radius:50%;background:#d32f2f;display:flex;align-items:center;justify-content:center;color:#fff;font-size:20px;font-weight:700;margin:0 auto 10px;}
+    .user-name{font-size:18px;font-weight:700;margin-bottom:5px;}
+    .user-status{font-size:14px;color:#666;}
+    .user-status.active{color:#2e7d32;}
+    .user-status.inactive{color:#d32f2f;}
+    .user-details{font-size:12px;color:#888;margin-top:5px;}
+    .refer-code-section{background:#e8f5e9;padding:10px;border-radius:6px;margin-top:10px;border:1px dashed #4caf50;}
+    .refer-code-label{font-size:12px;color:#666;margin-bottom:5px;}
+    .refer-code-value{font-size:14px;font-weight:700;color:#2e7d32;display:flex;justify-content:space-between;align-items:center;}
+    .copy-refer-btn{background:#4caf50;color:#fff;border:none;padding:4px 8px;border-radius:4px;cursor:pointer;font-size:10px;}
+
+    /* Page layout (single page app) */
+    .page{display:none}
+    .page.active{display:block}
+
+    /* My Team styles (scoped) */
+    #myTeamPage{background: linear-gradient(180deg, #f6e9f2 0%, #e9dff7 40%, #f3eaf5 100%); min-height:calc(100vh - 60px); padding-bottom:32px;}
+    #myTeamPage .welcome{background:#0b0b0b;color:#fff;padding:10px 16px;font-weight:700;text-align:center;letter-spacing:0.3px;width:100%;font-size:16px;overflow:hidden;position:relative;white-space:nowrap}
+    #myTeamPage .welcome span{color:#ff3b30;font-weight:800;display:inline-block;animation: glow 2s ease-in-out infinite alternate}
+    #myTeamPage .marquee-text{display:inline-block;position:relative;animation: scroll-left 10s linear infinite}
+    @keyframes scroll-left {0% { transform: translateX(100%);}100% { transform: translateX(-100%);}}
+    @keyframes glow{0%{ filter:brightness(1);}50%{ filter:brightness(1.5);}100%{ filter:brightness(1);}}
+
+    #myTeamPage .team-container{width:100%;max-width:400px;margin:18px auto;padding:0 12px}
+    #myTeamPage .card{background:rgba(255,255,255,0.95);border-radius:14px;padding:16px;box-shadow:0 6px 18px rgba(16,24,40,0.06);border:1px solid rgba(0,0,0,0.04);}
+    .card-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+    .card-head h2{margin:0;font-size:20px;font-weight:700}
+    .team-size{color:#6b7280;font-size:14px}
+    .team-size strong{ color:#ff3b30; font-weight:800; margin-left:6px; }
+    .gen-table{width:100%;border-collapse:collapse;background:transparent}
+    .gen-table th, .gen-table td{ text-align:left;padding:14px 12px;border-bottom:1px solid rgba(0,0,0,0.06);font-size:15px }
+    .gen-table th{ color:#374151;font-weight:700;background: rgba(255,255,255,0.6) }
+    .sn{width:56px;color:#6b7280;font-weight:600}
+    .generation{color:#111827}
+    .count{color:#ff3b30;font-weight:800;margin-left:6px}
+
+    /* Withdraw Page Styles */
+    #withdrawPage{background: linear-gradient(180deg, #f6f7fb 0%, #e9ecf5 100%); min-height:calc(100vh - 60px); padding-bottom:32px;}
+    .withdraw-header{background:linear-gradient(90deg, #ff512f, #dd2476);color:#fff;text-align:center;padding:16px;font-size:20px;font-weight:800;margin-bottom:20px;}
+    .withdraw-container{max-width:480px;margin:0 auto;background:#fff;padding:20px 18px;border-radius:15px;box-shadow:0 8px 25px rgba(0,0,0,0.08);}
+    .withdraw-form label{display:block;font-weight:700;margin:10px 0 6px}
+    .withdraw-form select, .withdraw-form input{width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:15px}
+    .withdraw-form select:focus, .withdraw-form input:focus{border-color:#dd2476;outline:none;box-shadow:0 0 0 3px rgba(221,36,118,0.15);}
+    .withdraw-btn{width:100%;background:linear-gradient(90deg, #ff512f, #dd2476);color:#fff;border:none;padding:12px;border-radius:10px;font-size:16px;font-weight:700;margin-top:10px;cursor:pointer;box-shadow:0 6px 18px rgba(221,36,118,0.18);}
+    .withdraw-btn:disabled{opacity:0.6;cursor:not-allowed;}
+    .withdraw-history{margin-top:30px}
+    .withdraw-card{background:#fff;border-radius:12px;padding:14px;margin:10px 0;box-shadow:0 4px 12px rgba(0,0,0,0.06);}
+    .withdraw-card p{margin:6px 0}
+    .pending{color:#fca311;font-weight:800}
+    .approved{color:#06d6a0;font-weight:800}
+    .rejected{color:#e63946;font-weight:800}
+
+    /* Loader */
+    .loader{width:55px;height:55px;border:6px solid #f3f3f3;border-top:6px solid #dd2476;border-radius:50%;animation:spin 1s linear infinite;margin:20px auto;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* Welcome popup styles (from your earlier design) */
+    .welcome-popup { position: fixed; inset:0; display:none; align-items:center; justify-content:center; background: rgba(0,0,0,0.4); z-index:4000; }
+    .welcome-card { background:#fff; padding:20px; border-radius:15px; width:85%; max-width:420px; text-align:center; animation: slideIn 550ms ease; }
+    .welcome-card h2 { color:#e63946; font-size:24px; margin-bottom:8px; }
+    .welcome-card p { text-align:justify; color:#333; line-height:1.6; margin:8px 0; }
+    .welcome-card button { background:#e63946; color:#fff; border:none; padding:10px 18px; border-radius:8px; cursor:pointer; font-weight:700; margin-top:12px; }
+    @keyframes slideIn{ from { transform: translateX(100%); opacity:0 } to { transform:translateX(0); opacity:1 } }
+
+    /* User Task Panel Styles */
+    .task-panel-body{font-family:sans-serif;background:#eef2f7;margin:0;padding:15px;}
+    .task-header{text-align:center;margin-bottom:20px;}
+    .task-header h2{margin:0;font-size:22px;font-weight:700;color:#222;}
+
+    .notice-box{
+      max-width:400px;margin:10px auto;
+      background:#fff3cd;padding:12px;border-left:6px solid #ffa500;
+      border-radius:10px;color:#333;
+      font-weight:600;font-size:15px;display:none;
+    }
+
+    .user-info{max-width:400px;margin:10px auto;padding:10px;background:#fff;border-radius:12px;box-shadow:0 4px 14px rgba(0,0,0,.12);}
+    .user-info input{width:48%;padding:8px;margin-right:4%;border:1px solid #ccc;border-radius:6px;}
+    .user-info button{padding:8px 12px;border:none;border-radius:6px;background:#4c6ef5;color:#fff;cursor:pointer;}
+
+    .section-title{
+      max-width:400px;
+      margin:20px auto 10px;
+      font-size:19px;
+      font-weight:700;
+      color:#222;
+    }
+
+    .task-list,.job-list{max-width:400px;margin:auto;}
+
+    .task-item,.job-item{
+      background:white;padding:12px;border-radius:12px;margin-bottom:14px;
+      box-shadow:0 4px 14px rgba(0,0,0,.12);
+    }
+
+    .task-top,.job-top{
+      display:flex;align-items:center;gap:12px;margin-bottom:8px;
+    }
+
+    .task-top img,.job-top img{
+      width:40px;height:40px;border-radius:10px;
+    }
+
+    .task-title,.job-title{
+      font-weight:600;font-size:16px;
+    }
+
+    .task-btn,.job-btn{
+      padding:8px 14px;border:none;border-radius:8px;cursor:pointer;font-weight:600;margin-top:8px;background:#4c6ef5;color:#fff;
+    }
+
+    .task-rule,.job-rule{
+      display:none;background:#f1f3f5;padding:10px;border-radius:8px;margin-top:10px;font-size:14px;
+    }
+
+    .rule-buttons{display:flex;gap:10px;margin-top:10px;}
+    .rule-buttons button{
+      flex:1;padding:8px;border:none;border-radius:8px;cursor:pointer;font-weight:600;color:#fff;background:#12b886;
+    }
+    .rule-buttons button:last-child{background:#228be6;}
+
+    .upload-list{margin-top:12px;}
+    .upload-item{
+      display:flex;align-items:center;gap:10px;background:#f8f9fa;padding:8px;border-radius:8px;margin-bottom:6px;
+    }
+    .upload-item img{width:40px;height:40px;border-radius:6px;cursor:pointer;}
+    .status{font-weight:600;padding:2px 6px;border-radius:4px;color:#fff;font-size:12px;}
+    .status.pending{background:#fab005;}
+    .status.approved{background:#12b886;}
+    .status.rejected{background:#f03e3e;}
+
+    .empty-state{
+      text-align:center;
+      padding:40px 20px;
+      color:#666;
+    }
+    .empty-state i{
+      font-size:48px;
+      margin-bottom:15px;
+      color:#ccc;
+    }
+
+    @media (max-width:420px){.card-head h2{ font-size:18px } .gen-table th, .gen-table td{ padding:12px 10px; font-size:14px } .welcome{ font-size:14px }}
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <a href="https://t.me/emergency57support38group" target="_blank" class="support-btn">🎧 ইমার্জেন্সি সাপোর্ট</a>
+  </div>
+  <header>
+    <div class="logo"><div class="mark">T</div><div style="font-weight:700">Tash2Cash-ONLINE</div></div>
+    <div class="hamburger" id="openDrawer">☰</div>
+  </header>
+
+  <!-- Drawer -->
+  <div class="drawer" id="drawer">
+    <!-- User Info in Drawer -->
+    <div class="user-drawer-info" id="userDrawerInfo" style="display: none;">
+      <div class="user-avatar" id="userAvatar">U</div>
+      <div class="user-name" id="userName">ব্যবহারকারীর নাম</div>
+      <div class="user-status inactive" id="userStatus">অ্যাকাউন্ট স্ট্যাটাস: নিষ্ক্রিয়</div>
+      <div class="user-details">
+        <div>লিডার র‍্যাঙ্ক: আসন্ন</div>
+        <div id="userReferId">রেফার আইডি: লোড হচ্ছে...</div>
+        <div id="joinDate">যোগদান: লোড হচ্ছে...</div>
+      </div>
+      <div class="refer-code-section">
+        <div class="refer-code-label">আপনার রেফার কোড:</div>
+        <div class="refer-code-value">
+          <span id="userReferCode">লোড হচ্ছে...</span>
+          <button class="copy-refer-btn" onclick="copyReferCode()">কপি</button>
+        </div>
+      </div>
+    </div>
+
+    <h3>menu</h3>
+    <a href="#" data-page="dashboardPage" class="nav-link">📊 Dashboard</a>
+    <a href="#" data-page="walletPage" class="nav-link">👛 Wallet</a>
+    <a href="#" data-page="withdrawPage" class="nav-link">💸 Withdraw</a>
+    <a href="#" id="openMyTeam" class="nav-link">👥 My Team</a>
+    <a href="#" data-page="myJobPage" class="nav-link">💼 My Job</a>
+    <a href="#" id="openGift" class="nav-link">🎁 Use Your GiftCode</a>
+    <a href="#" class="nav-link">📋 Job History</a>
+    <a href="#" class="nav-link">📞 Helpline</a>
+    <a href="#" id="logoutBtn">🚪 Logout</a>
+  </div>
+
+  <div class="overlay" id="overlay"></div>
+
+  <!-- Welcome Popup (your requested jetted welcome) -->
+  <div class="welcome-popup" id="welcomePopup">
+    <div class="welcome-card">
+      <h2>Welcome!</h2>
+      <p>
+        💎 <b>TASH2CASH — আপনার আয়ের নতুন দিগন্ত!</b><br><br>
+        🌟 TASH2CASH শুধুমাত্র একটি অ্যাপ নয়, এটি আপনার অনলাইন ইনকামের স্মার্ট সুযোগ।  
+        এখানে আপনি সহজভাবে কাজ করে প্রতিদিন আয় করতে পারবেন, নিজের টিম তৈরি করে প্যাসিভ ইনকাম গড়তে পারবেন,  
+        আর নিজের সময়কে দিতে পারবেন প্রকৃত মূল্য।  
+        <br><br>
+        💰 এখন সময় স্মার্টভাবে কাজ করার, সময় TASH2CASH–এর!  
+        <br><br>
+        🚀 আজই শুরু করুন আপনার সাফল্যের যাত্রা —  
+        <b>TASH2CASH: Earn Smart, Grow Fast!</b>
+      </p>
+      <button id="closeWelcomeBtn">Continue</button>
+    </div>
+  </div>
+
+  <!-- Pages -->
+  <main>
+    <!-- Dashboard Page -->
+    <section id="dashboardPage" class="page active">
+      <main class="container">
+        <div style="background:#000;padding:10px 12px;border-radius:6px;color:#fff;margin-bottom:12px;text-align:center;">
+          আমাদের এখানে মাত্র ৫ টাকা দিয়ে একাউন্ট একটিভ করে প্রতিদিন ৫০০-১০০০ টাকা ইনকাম করুন  MY NETWORK JOB এ আপনাকে স্বাগতম
+        </div>
+
+        <div class="notice" id="accountNotice">
+          <h2 id="noticeTitle">আপনার একাউন্টটি একটিভ নয়</h2>
+          <p id="noticeMessage">একটিভ করুন ধন্যবাদ।</p>
+          <button class="btn-red" onclick="openModal()">Active Now</button>
+        </div>
+
+        <div class="grid">
+          <div class="card" style="background:#ffe082"><div class="amount"><i class="fa-solid fa-wallet"></i>BDT.<span id="totalIncome">0</span></div><div class="label">Total Income</div></div>
+          <div class="card" style="background:#ef9a9a"><div class="amount"><i class="fa-solid fa-briefcase"></i>BDT.<span id="jobCommission">0</span></div><div class="label">Job Commission</div></div>
+          <div class="card" style="background:#81d4fa"><div class="amount"><i class="fa-solid fa-user-plus"></i>BDT.<span id="referCommission">0</span></div><div class="label">Refer Commission</div></div>
+          <div class="card" style="background:#ffcc80"><div class="amount"><i class="fa-solid fa-bullseye"></i>BDT.<span id="taskCommission">0</span></div><div class="label">Task Commission</div></div>
+          <div class="card" style="background:#b39ddb"><div class="amount"><i class="fa-solid fa-envelope"></i>BDT.<span id="gmailCommission">0</span></div><div class="label">Gmail Commission</div></div>
+          <div class="card" style="background:#90caf9"><div class="amount"><i class="fa-brands fa-facebook"></i>BDT.<span id="facebookCommission">0</span></div><div class="label">Facebook Commission</div></div>
+        </div>
+      </main>
+    </section>
+
+    <!-- Wallet Page -->
+    <section id="walletPage" class="page">
+      <div style="padding:18px">
+        <h2>Wallet</h2>
+        <p>এখানে Wallet সম্পর্কিত তথ্য দেখাবে — ব্যালেন্স, ট্রান্সঅ্যাকশন, ইত্যাদি।</p>
+      </div>
+    </section>
+
+    <!-- Withdraw Page -->
+    <section id="withdrawPage" class="page">
+      <div class="withdraw-header">💎 TASH2CASH Withdraw</div>
+      <div class="withdraw-container">
+        <h2>💰 Withdraw </h2>
+        <form class="withdraw-form">
+          <label for="withdrawMethod">পেমেন্ট মাধ্যম নির্বাচন করুন:</label>
+          <select id="withdrawMethod">
+            <option value="" disabled selected>-- সিলেক্ট করুন --</option>
+            <option value="Bkash">Bkash</option>
+            <option value="Nagad">Nagad</option>
+            <option value="Rocket">Rocket</option>
+          </select>
+
+          <label for="withdrawType1">টাইপ নির্বাচন করুন (Personal / Agent):</label>
+          <select id="withdrawType1">
+            <option value="" disabled selected>-- সিলেক্ট করুন --</option>
+            <option value="Personal">Personal</option>
+            <option value="Agent">Agent</option>
+          </select>
+
+          <label for="withdrawType2">টাইপ নির্বাচন করুন (Refer / Job Withdraw):</label>
+          <select id="withdrawType2">
+            <option value="" disabled selected>-- সিলেক্ট করুন --</option>
+            <option value="Refer Withdraw">Refer Withdraw</option>
+            <option value="Job Withdraw">Job Withdraw</option>
+          </select>
+
+          <label for="withdrawNumber">নাম্বার লিখুন:</label>
+          <input type="text" id="withdrawNumber" placeholder="যেমনঃ 01XXXXXXXXX">
+
+          <label for="withdrawAmount">উইথড্র পরিমাণ (৳):</label>
+          <input type="number" id="withdrawAmount" placeholder="যেমনঃ 500">
+
+          <button type="button" class="withdraw-btn" id="withdrawRequestBtn">📤 Withdraw অনুরোধ পাঠান</button>
+        </form>
+
+        <div class="withdraw-history" id="withdrawHistory">
+          <h3>🧾 Withdraw হিস্টরি</h3>
+          <div id="withdrawHistoryList"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- My Team Page -->
+    <section id="myTeamPage" class="page">
+      <div class="welcome">
+        <div class="marquee-text"><span>TASH2CASH</span> এ আপনাকে স্বাগতম! <span>TASH2CASH Team Member Group।</span></div>
+      </div>
+      <div class="team-container">
+        <div class="card" role="region" aria-labelledby="generations-title">
+          <div class="card-head">
+            <h2 id="generations-title">My Generations</h2>
+            <div class="team-size">My Team Size: <strong id="team-size">0</strong></div>
+          </div>
+          <table class="gen-table" aria-describedby="generation-list">
+            <thead>
+              <tr>
+                <th class="sn">SN</th>
+                <th>Generation</th>
+              </tr>
+            </thead>
+            <tbody id="generation-list">
+              <tr>
+                <td class="sn">1</td>
+                <td class="generation">Team LV~1. <span class="count" id="lv1">(0)</span></td>
+              </tr>
+              <tr>
+                <td class="sn">2</td>
+                <td class="generation">Team LV~2. <span class="count" id="lv2">(0)</span></td>
+              </tr>
+              <tr>
+                <td class="sn">3</td>
+                <td class="generation">Team LV~3. <span class="count" id="lv3">(0)</span></td>
+              </tr>
+              <tr>
+                <td class="sn">4</td>
+                <td class="generation">Team LV~4. <span class="count" id="lv4">(0)</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- My Job Page - Your Task Panel -->
+    <section id="myJobPage" class="page">
+      <div class="task-panel-body">
+        <div class="task-header"><h2>Task Earn Panel</h2></div>
+
+        <!-- 🔔 Notice Box -->
+        <div id="noticeBox" class="notice-box"></div>
+
+        <div class="user-info">
+          <input type="text" id="accountID" placeholder="Account ID">
+          <input type="text" id="userName" placeholder="Name">
+          <button onclick="saveUserInfo()">Save</button>
+        </div>
+
+        <!-- TASK SECTION -->
+        <div class="section-title">🔹 Today Tasks</div>
+        <div class="task-list" id="taskArea"></div>
+
+        <!-- MY JOB SECTION -->
+        <div class="section-title">🔹 My Job</div>
+        <div class="job-list" id="jobArea"></div>
+
+        <!-- UPLOAD SECTION -->
+        <div class="upload-list" id="uploadList"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Work List Modal -->
+  <div class="modal" id="workListModal">
+    <div class="modal-content">
+      <h2>কাজের লিস্ট</h2>
+      <ul>
+        <li>📧 Gmail Verification</li>
+        <li>👍 Facebook Like & Share</li>
+        <li>👥 Refer & Earn</li>
+        <li>📝 Task Complete</li>
+      </ul>
+      <button style="margin-top:15px;background:#f44336;color:#fff;padding:8px 14px;border:none;border-radius:6px;cursor:pointer" onclick="closeWorkList()">বন্ধ করুন</button>
+    </div>
+  </div>
+
+  <!-- Payment Modal -->
+  <div class="modal" id="paymentModal">
+    <div class="modal-content">
+      <h2>পেমেন্ট মাধ্যম নির্বাচন করুন</h2>
+      <div class="grid-pay">
+        <div class="pay-btn" onclick="selectPayment('bKash')">bKash</div>
+        <div class="pay-btn" onclick="selectPayment('Nagad')">Nagad</div>
+      </div>
+      <div id="modalNotice">
+        <span id="noticeText"></span>
+        <div id="noticeButtons">
+          <button onclick="confirmPayment()" style="padding:8px 16px;margin-right:10px;background:#4caf50;color:#fff;border:none;border-radius:6px;cursor:pointer;">ওকে</button>
+          <button onclick="cancelPayment()" style="padding:8px 16px;background:#f44336;color:#fff;border:none;border-radius:6px;cursor:pointer;">বাতিল</button>
+        </div>
+      </div>
+      <button class="pay-now" onclick="payNow()">Pay ৳2</button>
+      <button style="margin-top:10px;background:#ccc;color:#000;border:none;padding:8px 14px;border-radius:6px;cursor:pointer" onclick="closeModal()">ফিরে যান</button>
+    </div>
+  </div>
+
+  <!-- Transaction Modal -->
+  <div class="modal" id="transactionModal">
+    <div class="modal-content">
+      <h2>ট্রানজেকশন তথ্য দিন</h2>
+      <p id="paymentInstruction">দয়া করে নিচের নাম্বারে <b>Send Money</b> করুন এবং Transaction ID দিন।</p>
+      <div class="form-group">
+        <label>পেমেন্ট নাম্বার: <b id="paymentNumber">01986755106</b>
+          <button class="copy-btn" onclick="copyNumber()">Copy</button>
+        </label>
+      </div>
+      <div class="form-group">
+        <label>Transaction ID:</label>
+        <input type="text" id="trxId" placeholder="TXN12345" />
+      </div>
+      <button class="verify-btn" onclick="verifyPayment()">VERIFY</button>
+      <button class="cancel-btn" onclick="closeTransactionModal()">বাতিল</button>
+    </div>
+  </div>
+
+  <!-- Refer Code Modal -->
+  <div class="modal" id="referCodeModal">
+    <div class="modal-content">
+      <h2>রেফার কোড</h2>
+      <p>আপনার রেফার কোড ব্যবহার করে যে ব্যক্তি টাকা পাঠিয়েছেন তার তথ্য দিন:</p>
+      <div class="form-group">
+        <label>যে নাম্বার থেকে টাকা পাঠিয়েছেন:</label>
+        <input type="text" id="referNumber" placeholder="01XXXXXXXXX" />
+      </div>
+      <div class="form-group">
+        <label>ট্রানজেকশন আইডি:</label>
+        <input type="text" id="referTrxId" placeholder="TXN12345" />
+      </div>
+      <button class="verify-btn" onclick="submitReferCode()">সাবমিট করুন</button>
+      <button class="cancel-btn" onclick="closeReferCodeModal()">বাতিল</button>
+    </div>
+  </div>
+
+  <!-- Authentication Modal -->
+  <div class="modal" id="authModal">
+    <div class="modal-content">
+      <div class="auth-tabs">
+        <div class="auth-tab active" id="loginTab">লগইন</div>
+        <div class="auth-tab" id="signupTab">সাইন আপ</div>
+      </div>
+
+      <!-- Login Form -->
+      <div class="auth-form active" id="loginForm">
+        <h2>লগইন করুন</h2>
+        <div class="form-group">
+          <label>মোবাইল নাম্বার:</label>
+          <input type="text" id="loginNumber" placeholder="01XXXXXXXXX" />
+        </div>
+        <div class="form-group">
+          <label>পাসওয়ার্ড:</label>
+          <input type="password" id="loginPassword" placeholder="পাসওয়ার্ড দিন" />
+        </div>
+        <button class="verify-btn" onclick="login()">লগইন</button>
+        <div class="toggle-auth" onclick="showSignup()">একাউন্ট নেই? সাইন আপ করুন</div>
+      </div>
+
+      <!-- Signup Form -->
+      <div class="auth-form" id="signupForm">
+        <h2>সাইন আপ করুন</h2>
+        <div class="form-group">
+          <label>নাম:</label>
+          <input type="text" id="name" placeholder="আপনার নাম" />
+        </div>
+        <div class="form-group">
+          <label>মোবাইল নাম্বার:</label>
+          <input type="text" id="signupNumber" placeholder="01XXXXXXXXX" />
+        </div>
+        <div class="form-group">
+          <label>জিমেইল:</label>
+          <input type="email" id="email" placeholder="আপনার ইমেইল" />
+        </div>
+        <div class="form-group">
+          <label>রেফার কোড (ঐচ্ছিক):</label>
+          <input type="text" id="referCode" placeholder="রেফার কোড (যদি থাকে)" />
+        </div>
+        <div class="form-group">
+          <label>পাসওয়ার্ড:</label>
+          <input type="password" id="signupPassword" placeholder="পাসওয়ার্ড দিন" />
+        </div>
+        <button class="verify-btn" onclick="signup()">সাইন আপ</button>
+        <div class="toggle-auth" onclick="showLogin()">ইতিমধ্যে একাউন্ট আছে? লগইন করুন</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Box -->
+  <div id="toast" class="toast"></div>
+
+  <script>
+    // --- basic state ---
+    let isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    let userName = localStorage.getItem('userName') || '';
+    let userReferCode = localStorage.getItem('userReferCode') || '';
+    let userReferId = localStorage.getItem('userReferId') || '';
+    let joinDate = localStorage.getItem('joinDate') || '';
+
+    // payment numbers
+    const paymentNumbers = { 'bKash': '01986755106', 'Nagad': '01876543210' };
+    let selectedPayment = null;
+    let currentPaymentNumber = '';
+
+    // utility helpers
+    function generateReferCode() { return 'REF' + Math.floor(100000000 + Math.random() * 900000000); }
+    function generateReferId() { return Math.floor(100000000 + Math.random() * 900000000).toString(); }
+    function getCurrentDate() {
+      const months = ['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];
+      const days = ['রবি','সোম','মঙ্গল','বুধ','বৃহ','শুক্র','শনি'];
+      const now = new Date(); return `${days[now.getDay()]} ${months[now.getMonth()]} ${now.getFullYear()}`;
+    }
+
+    // show toast
+    let toastTimeout;
+    function showToast(message){
+      const toast = document.getElementById('toast');
+      toast.innerText = message; toast.classList.remove('show'); clearTimeout(toastTimeout);
+      setTimeout(()=>{toast.classList.add('show');},100);
+      toastTimeout = setTimeout(()=>{toast.classList.remove('show');},3000);
+    }
+
+    // Update user info in drawer
+    function updateUserInfoInDrawer() {
+      const userDrawerInfo = document.getElementById('userDrawerInfo');
+      const userNameElement = document.getElementById('userName');
+      const userAvatar = document.getElementById('userAvatar');
+      const userStatus = document.getElementById('userStatus');
+      const userReferCodeElement = document.getElementById('userReferCode');
+      const userReferIdElement = document.getElementById('userReferId');
+      const joinDateElement = document.getElementById('joinDate');
+
+      if (localStorage.getItem('isLoggedIn') === 'true') {
+        userDrawerInfo.style.display = 'block';
+        userName = localStorage.getItem('userName') || 'ব্যবহারকারী';
+        userReferCode = localStorage.getItem('userReferCode') || '';
+        userReferId = localStorage.getItem('userReferId') || '';
+        joinDate = localStorage.getItem('joinDate') || '';
+
+        userNameElement.textContent = userName;
+        userAvatar.textContent = userName.charAt(0).toUpperCase();
+        userReferCodeElement.textContent = userReferCode;
+        userReferIdElement.textContent = `রেফার আইডি: ${userReferId}`;
+        joinDateElement.textContent = `যোগদান: ${joinDate}`;
+
+        const isActive = localStorage.getItem('isActive') === 'true';
+        if (isActive) { userStatus.textContent = 'অ্যাকাউন্ট স্ট্যাটাস: সক্রিয়'; userStatus.className = 'user-status active';
+        } else { userStatus.textContent = 'অ্যাকাউন্ট স্ট্যাটাস: নিষ্ক্রিয়'; userStatus.className = 'user-status inactive'; }
+      } else {
+        userDrawerInfo.style.display = 'none';
+      }
+    }
+
+    // copy refer code
+    function copyReferCode(){ const referCode = document.getElementById('userReferCode').textContent; const ta = document.createElement('textarea'); ta.value = referCode; document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0,99999);
+      try { document.execCommand('copy'); showToast('📋 রেফার কোড কপি হয়েছে ✅ এখন শেয়ার করুন!'); } catch(e){ showToast('❌ কপি করতে সমস্যা হয়েছে'); }
+      document.body.removeChild(ta);
+    }
+
+    // Drawer open/close
+    const drawer = document.getElementById('drawer'); const overlay = document.getElementById('overlay');
+    document.getElementById('openDrawer').addEventListener('click', ()=>{
+      if (localStorage.getItem('isLoggedIn') === 'true') { drawer.classList.add('open'); overlay.classList.add('show'); }
+      else { document.getElementById('authModal').classList.add('show'); showToast('দয়া করে প্রথমে লগইন করুন'); }
+    });
+    overlay.addEventListener('click', ()=>{ drawer.classList.remove('open'); overlay.classList.remove('show'); });
+
+    // page navigation
+    function showPage(pageId){ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active')); document.getElementById(pageId).classList.add('active'); drawer.classList.remove('open'); overlay.classList.remove('show'); window.scrollTo(0,0); }
+
+    document.querySelectorAll('.nav-link[data-page]').forEach(a=>{
+      a.addEventListener('click', (e)=>{ e.preventDefault(); const page = a.getAttribute('data-page'); showPage(page); });
+    });
+
+    // special nav actions
+    document.getElementById('openMyTeam').addEventListener('click',(e)=>{ e.preventDefault(); if (localStorage.getItem('isLoggedIn')==='true'){ showPage('myTeamPage'); } else { showToast('দয়া করে প্রথমে লগইন করুন'); document.getElementById('authModal').classList.add('show'); } });
+
+    // close worklist
+    function closeWorkList(){ document.getElementById('workListModal').classList.remove('show'); }
+
+    // Payment modal flow
+    function openModal(){ document.getElementById('paymentModal').classList.add('show'); }
+    function closeModal(){ document.getElementById('paymentModal').classList.remove('show'); selectedPayment = null; document.getElementById('modalNotice').style.display='none'; }
+    function selectPayment(method){ selectedPayment = method; currentPaymentNumber = paymentNumbers[method]; document.getElementById('modalNotice').style.display='block'; document.getElementById('noticeText').innerText = method + ' সিলেক্ট হয়েছে ✅'; document.getElementById('noticeButtons').style.display='none'; }
+    function payNow(){ if(selectedPayment){ document.getElementById('modalNotice').style.display='block'; document.getElementById('noticeText').innerText = 'আপনি '+selectedPayment+' দিয়ে পেমেন্ট করতে যাচ্ছেন 💳'; document.getElementById('noticeButtons').style.display='block'; } else { document.getElementById('modalNotice').style.display='block'; document.getElementById('noticeText').innerText = 'প্রথমে একটি পেমেন্ট মাধ্যম সিলেক্ট করুন ⚠️'; document.getElementById('noticeButtons').style.display='none'; } }
+    function confirmPayment(){ document.getElementById('paymentModal').classList.remove('show'); document.getElementById('paymentNumber').innerText = currentPaymentNumber; document.getElementById('paymentInstruction').innerHTML = `দয়া করে নিচের <b>${selectedPayment}</b> নাম্বারে <b>Send Money</b> করুন এবং Transaction ID দিন।`; document.getElementById('transactionModal').classList.add('show'); }
+    function cancelPayment(){ document.getElementById('modalNotice').style.display='none'; }
+    function closeTransactionModal(){ document.getElementById('transactionModal').classList.remove('show'); }
+    function copyNumber(){ const number = document.getElementById('paymentNumber').innerText; const ta = document.createElement('textarea'); ta.value = number; document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0,99999); try{ document.execCommand('copy'); showToast('📋 নম্বর কপি হয়েছে ✅ এখন Send Money করুন।'); }catch(e){ showToast('❌ কপি করতে সমস্যা হয়েছে'); } document.body.removeChild(ta); }
+    function verifyPayment(){ const trx = document.getElementById('trxId').value.trim(); if(trx){ showToast('Transaction ID '+trx+' ভেরিফাই হয়েছে ✅'); closeTransactionModal(); updateNotice('success','অভিনন্দন!','আপনার একাউন্ট সফলভাবে একটিভ হয়েছে!'); localStorage.setItem('isActive','true'); updateUserInfoInDrawer(); } else { showToast('⚠️ দয়া করে Transaction ID দিন'); } }
+
+    // Withdraw modal (old)
+    function closeWithdrawModal(){ document.getElementById('withdrawModal').classList.remove('show'); }
+    function submitWithdraw(){ const method = document.getElementById('withdrawMethod').value; const number = document.getElementById('withdrawNumber').value; const amount = document.getElementById('withdrawAmount').value; if(method && number && amount){ showToast('✅ উইথড্র রিকোয়েস্ট সাবমিট হয়েছে | Method: '+method+' | Number: '+number+' | Amount: ৳'+amount); closeWithdrawModal(); } else { showToast('⚠️ সব ঘর পূরণ করুন'); } }
+
+    // Refer code modal
+    function closeReferCodeModal(){ document.getElementById('referCodeModal').classList.remove('show'); }
+    function submitReferCode(){ const number = document.getElementById('referNumber').value; const trxId = document.getElementById('referTrxId').value; if(number && trxId){ showToast('✅ রেফার কোড তথ্য সাবমিট হয়েছে | Number: '+number+' | Trx ID: '+trxId); closeReferCodeModal(); } else { showToast('⚠️ সব ঘর পূরণ করুন'); } }
+
+    // Auth helpers
+    function showLogin(){ document.getElementById('loginTab').classList.add('active'); document.getElementById('signupTab').classList.remove('active'); document.getElementById('loginForm').classList.add('active'); document.getElementById('signupForm').classList.remove('active'); }
+    function showSignup(){ document.getElementById('signupTab').classList.add('active'); document.getElementById('loginTab').classList.remove('active'); document.getElementById('signupForm').classList.add('active'); document.getElementById('loginForm').classList.remove('active'); }
+
+    // ---- Welcome popup controls ----
+    const welcomePopupEl = document.getElementById('welcomePopup');
+    const closeWelcomeBtn = document.getElementById('closeWelcomeBtn');
+
+    function showWelcomePopup() {
+      welcomePopupEl.style.display = 'flex';
+    }
+    function hideWelcomePopup() {
+      welcomePopupEl.style.display = 'none';
+    }
+    closeWelcomeBtn.addEventListener('click', hideWelcomePopup);
+
+    // Login and signup with welcome popup trigger
+    function signup(){
+      const name = document.getElementById('name').value.trim();
+      const number = document.getElementById('signupNumber').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('signupPassword').value.trim();
+      if(!name || !number || !email || !password){ showToast('দয়া করে সব প্রয়োজনীয় তথ্য দিন'); return; }
+      if(number.length !== 11){ showToast('সঠিক মোবাইল নাম্বার দিন (11 ডিজিট)'); return; }
+      const newReferCode = generateReferCode();
+      const newReferId = generateReferId();
+      const currentDate = getCurrentDate();
+      localStorage.setItem('isLoggedIn','true');
+      localStorage.setItem('userName',name);
+      localStorage.setItem('userEmail',email);
+      localStorage.setItem('userNumber',number);
+      localStorage.setItem('userReferCode',newReferCode);
+      localStorage.setItem('userReferId',newReferId);
+      localStorage.setItem('joinDate',currentDate);
+      localStorage.setItem('userPassword',password);
+      localStorage.setItem('isActive','false');
+      document.getElementById('authModal').classList.remove('show');
+      showToast('সফলভাবে সাইন আপ হয়েছে! 🎉');
+      updateUserInfoInDrawer();
+      updateNotice('warning','অ্যাকাউন্ট তৈরি হয়েছে!','এখন একটিভ করতে ১০০ টাকা পেমেন্ট করুন.');
+
+      // show welcome popup after signup (as requested)
+      setTimeout(showWelcomePopup, 350);
+    }
+
+    function login(){
+      const number = document.getElementById('loginNumber').value.trim();
+      const password = document.getElementById('loginPassword').value.trim();
+      const savedNumber = localStorage.getItem('userNumber');
+      const savedPassword = localStorage.getItem('userPassword');
+      if(!number||!password){ showToast('দয়া করে মোবাইল নাম্বার এবং পাসওয়ার্ড দিন'); return; }
+      if(number === savedNumber && password === savedPassword){
+        localStorage.setItem('isLoggedIn','true');
+        document.getElementById('authModal').classList.remove('show');
+        showToast('সফলভাবে লগইন হয়েছে! 🎉');
+        updateUserInfoInDrawer();
+        updateNotice('info','স্বাগতম!','আপনার একাউন্টে লগইন হয়েছে। এখন কাজ শুরু করুন!');
+
+        // show welcome popup after login (as requested)
+        setTimeout(showWelcomePopup, 350);
+      } else { showToast('মোবাইল নাম্বার বা পাসওয়ার্ড ভুল'); }
+    }
+
+    // Logout
+    document.getElementById('logoutBtn').addEventListener('click', function(e){ e.preventDefault(); localStorage.setItem('isLoggedIn','false'); showToast('সফলভাবে লগআউট হয়েছে'); setTimeout(()=>{ location.reload(); },800); });
+
+    // Notice update
+    function updateNotice(type,title,message){ const notice = document.getElementById('accountNotice'); const noticeTitle = document.getElementById('noticeTitle'); const noticeMessage = document.getElementById('noticeMessage'); noticeTitle.innerText = title; noticeMessage.innerText = message; switch(type){ case 'success': notice.style.background = '#4caf50'; break; case 'warning': notice.style.background = '#ff9800'; break; case 'error': notice.style.background = '#f44336'; break; case 'info': notice.style.background = '#2196f3'; break; default: notice.style.background = '#39a56a'; } }
+
+    // Auto notice rotation demo
+    let noticeIndex = 0; const notices = [{type:'error',title:'আপনার একাউন্টটি একটিভ নয়',message:'একটিভ করুন ধন্যবাদ।'},{type:'warning',title:'আপনার একাউন্টটি একটিভ নয়',message:'একটিভ করুন ধন্যবাদ।'},{type:'info',title:'আপনার একাউন্টটি একটিভ নয়',message:'একটিভ করুন ধন্যবাদ।'},{type:'success',title:'আপনার একাউন্টটি একটিভ নয়',message:'একটিভ করুন ধন্যবাদ।'}];
+    setInterval(()=>{ if(localStorage.getItem('isLoggedIn')==='true'){ updateNotice(notices[noticeIndex].type,notices[noticeIndex].title,notices[noticeIndex].message); noticeIndex=(noticeIndex+1)%notices.length; } },10000);
+
+    // Withdraw System Functions
+    const withdrawType2 = document.getElementById('withdrawType2');
+    const withdrawAmount = document.getElementById('withdrawAmount');
+    const withdrawRequestBtn = document.getElementById('withdrawRequestBtn');
+    const withdrawHistoryList = document.getElementById('withdrawHistoryList');
+
+    // 💡 Withdraw টাইপ অনুযায়ী placeholder পরিবর্তন
+    withdrawType2.addEventListener('change', function(){
+      if(this.value === 'Refer Withdraw'){
+        withdrawAmount.placeholder = 'যেমনঃ ২০ – ২৫,০০০';
+      } else if(this.value === 'Job Withdraw'){
+        withdrawAmount.placeholder = 'যেমনঃ ২০০ – ২৫,০০০';
+      } else {
+        withdrawAmount.placeholder = 'যেমনঃ 500';
+      }
+    });
+
+    function createWithdrawCard({method, type1, type2, number, amount, status}){
+      const div = document.createElement('div');
+      div.className = 'withdraw-card';
+      div.innerHTML = `
+        <p><b>মাধ্যম:</b> ${method}</p>
+        <p><b>টাইপ:</b> ${type1} | ${type2}</p>
+        <p><b>নাম্বার:</b> ${number}</p>
+        <p><b>পরিমাণ:</b> ${amount}৳</p>
+        <p><b>অবস্থা:</b> <span class="${status.toLowerCase()}">${status}</span></p>`;
+      return div;
+    }
+
+    function submitWithdrawRequest(){
+      const method = document.getElementById('withdrawMethod').value;
+      const type1 = document.getElementById('withdrawType1').value;
+      const type2 = document.getElementById('withdrawType2').value;
+      const number = document.getElementById('withdrawNumber').value.trim();
+      const amount = document.getElementById('withdrawAmount').value.trim();
+
+      if(!method){showToast('দয়া করে পেমেন্ট মাধ্যম নির্বাচন করুন।');return;}
+      if(!type1){showToast('দয়া করে Personal / Agent নির্বাচন করুন।');return;}
+      if(!type2){showToast('দয়া করে Refer / Job Withdraw নির্বাচন করুন।');return;}
+      if(!number || !amount){showToast('দয়া করে নাম্বার ও পরিমাণ পূরণ করুন।');return;}
+
+      const amt = Number(amount);
+      if(type2 === "Refer Withdraw" && (amt < 20 || amt > 25000)){
+        showToast('Refer Withdraw এর জন্য পরিমাণ ২০ টাকা থেকে ২৫,০০০ টাকার মধ্যে হতে হবে।');
+        return;
+      }
+      if(type2 === "Job Withdraw" && (amt < 200 || amt > 25000)){
+        showToast('Job Withdraw এর জন্য পরিমাণ ২০০ টাকা থেকে ২৫,০০০ টাকার মধ্যে হতে হবে।');
+        return;
+      }
+
+      withdrawRequestBtn.disabled = true;
+      showToast('Withdraw request processing...');
+
+      setTimeout(() => {
+        const card = createWithdrawCard({method, type1, type2, number, amount, status: 'Pending'});
+        withdrawHistoryList.prepend(card);
+        showToast('✅ Withdraw অনুরোধ সফলভাবে পাঠানো হয়েছে!');
+
+        // Clear form
+        document.getElementById('withdrawNumber').value = '';
+        document.getElementById('withdrawAmount').value = '';
+        withdrawRequestBtn.disabled = false;
+
+        // Save to localStorage
+        saveWithdrawHistory({method, type1, type2, number, amount, status: 'Pending', date: new Date().toLocaleString()});
+      }, 2000);
+    }
+
+    function saveWithdrawHistory(withdrawData) {
+      let history = JSON.parse(localStorage.getItem('withdrawHistory') || '[]');
+      history.unshift(withdrawData);
+      localStorage.setItem('withdrawHistory', JSON.stringify(history));
+    }
+
+    function loadWithdrawHistory() {
+      const history = JSON.parse(localStorage.getItem('withdrawHistory') || '[]');
+      withdrawHistoryList.innerHTML = '';
+
+      if (history.length === 0) {
+        withdrawHistoryList.innerHTML = '<p style="text-align:center;color:#666;">কোনো Withdraw ইতিহাস নেই</p>';
+        return;
+      }
+
+      history.forEach(item => {
+        const card = createWithdrawCard(item);
+        withdrawHistoryList.appendChild(card);
+      });
+    }
+
+    /* ===== User Task Panel Functions ===== */
+    function loadNotice(){
+      const box = document.getElementById("noticeBox");
+      const notice = localStorage.getItem("notice") || "";
+
+      if(notice.trim() === ""){
+        box.style.display = "none";
+      } else {
+        box.innerText = "🔔 Notice: " + notice;
+        box.style.display = "block";
+      }
+    }
+
+    function getTasks(){
+      return JSON.parse(localStorage.getItem("tasks") || "[]");
+    }
+
+    function getJobs(){
+      return JSON.parse(localStorage.getItem("myjobs") || "[]");
+    }
+
+    let userInfo = JSON.parse(localStorage.getItem("userInfo")||"{}");
+
+    if(userInfo.id) document.getElementById('accountID').value = userInfo.id;
+    if(userInfo.name) document.getElementById('userName').value = userInfo.name;
+
+    function saveUserInfo(){
+      const id = document.getElementById('accountID').value.trim();
+      const name = document.getElementById('userName').value.trim();
+      if(!id || !name) return showToast("Account ID & নাম দিন");
+
+      userInfo = {id,name};
+      localStorage.setItem("userInfo", JSON.stringify(userInfo));
+
+      loadTasks();
+      loadJobs();
+      loadUploads();
+      showToast("Saved ✔");
+    }
+
+    function loadTasks(){
+      const area = document.getElementById("taskArea");
+      area.innerHTML = "";
+
+      if(!userInfo.id) return;
+
+      const tasks = getTasks();
+
+      if(tasks.length === 0) {
+        area.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-tasks"></i>
+            <h3>কোন টাস্ক নেই</h3>
+            <p>এখনো কোনো টাস্ক যোগ করা হয়নি। এডমিন শীঘ্রই নতুন টাস্ক যোগ করবেন।</p>
+          </div>
+        `;
+        return;
+      }
+
+      tasks.forEach(t=>{
+        const div = document.createElement("div");
+        div.className="task-item";
+
+        div.innerHTML=`
+          <div class="task-top">
+            <img src="${t.icon}">
+            <div class="task-title">${t.title} - ৳${t.reward}</div>
+          </div>
+
+          <button class="task-btn" onclick="toggleRule(this)">Do</button>
+
+          <div class="task-rule">
+            ${t.desc}
+            <div class="rule-buttons">
+              <button onclick="window.open('${t.link}', '_blank')">Open</button>
+              <button onclick="uploadImage('${t.title}')">Upload Proof</button>
+            </div>
+          </div>
+        `;
+
+        area.appendChild(div);
+      });
+    }
+
+    function loadJobs(){
+      const area = document.getElementById("jobArea");
+      area.innerHTML = "";
+
+      if(!userInfo.id) return;
+
+      const jobs = getJobs();
+
+      if(jobs.length === 0) {
+        area.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-briefcase"></i>
+            <h3>কোন জব নেই</h3>
+            <p>এখনো কোনো জব যোগ করা হয়নি। এডমিন শীঘ্রই নতুন জব যোগ করবেন।</p>
+          </div>
+        `;
+        return;
+      }
+
+      jobs.forEach(j=>{
+        const div = document.createElement("div");
+        div.className="job-item";
+
+        div.innerHTML=`
+          <div class="job-top">
+            <img src="${j.icon}">
+            <div class="job-title">${j.title} - ৳${j.pay}</div>
+          </div>
+
+          <button class="job-btn" onclick="toggleRule(this)">Start</button>
+
+          <div class="job-rule">
+            ${j.desc}
+            <div class="rule-buttons">
+              <button onclick="window.open('${j.link}', '_blank')">Open</button>
+              <button onclick="uploadImage('${j.title}')">Upload Proof</button>
+            </div>
+          </div>
+        `;
+
+        area.appendChild(div);
+      });
+    }
+
+    function toggleRule(btn){
+      const rule = btn.nextElementSibling;
+      rule.style.display = rule.style.display=="block"?"none":"block";
+    }
+
+    function uploadImage(taskName){
+      if(!userInfo.id) return showToast("প্রথমে Account ID দিন");
+
+      const input = document.createElement("input");
+      input.type="file";
+      input.accept="image/*";
+
+      input.onchange=e=>{
+        const file = e.target.files[0];
+        if(!file) return;
+
+        const reader = new FileReader();
+        reader.onload = ()=>{
+
+          let uploads = JSON.parse(localStorage.getItem("uploadedImages")||"[]");
+
+          uploads.unshift({
+            id:Date.now(),
+            accountID:userInfo.id,
+            name:userInfo.name,
+            task:taskName,
+            data:reader.result,
+            time:Date.now(),
+            status:"pending"
+          });
+
+          localStorage.setItem("uploadedImages",JSON.stringify(uploads));
+          loadUploads();
+          showToast("Submitted ✔");
+        };
+
+        reader.readAsDataURL(file);
+      };
+
+      input.click();
+    }
+
+    function loadUploads(){
+      const list = document.getElementById("uploadList");
+
+      const uploads = JSON.parse(localStorage.getItem("uploadedImages")||"[]")
+      .filter(u=>u.accountID===userInfo.id);
+
+      list.innerHTML = "";
+
+      if(uploads.length === 0) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <h3>কোন সাবমিশন নেই</h3>
+            <p>আপনি এখনো কোনো কাজ সাবমিট করেননি।</p>
+          </div>
+        `;
+        return;
+      }
+
+      uploads.forEach(u=>{
+        list.innerHTML += `
+          <div class="upload-item">
+            <img src="${u.data}">
+            <div>
+              <div>Task: ${u.task}</div>
+              <div>Status: <span class="status ${u.status}">${u.status}</span></div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    // Initialize UI on load
+    window.addEventListener('DOMContentLoaded', ()=>{
+      if(localStorage.getItem('isLoggedIn')!=='true'){
+        document.getElementById('authModal').classList.add('show');
+      }
+      updateUserInfoInDrawer();
+
+      // load team counts from localStorage (demo)
+      const lv1 = localStorage.getItem('team_lv1') || '0';
+      const lv2 = localStorage.getItem('team_lv2') || '0';
+      const lv3 = localStorage.getItem('team_lv3') || '0';
+      const lv4 = localStorage.getItem('team_lv4') || '0';
+      document.getElementById('lv1').innerText = `(${lv1})`;
+      document.getElementById('lv2').innerText = `(${lv2})`;
+      document.getElementById('lv3').innerText = `(${lv3})`;
+      document.getElementById('lv4').innerText = `(${lv4})`;
+      const total = [+lv1,+lv2,+lv3,+lv4].reduce((a,b)=>a+b,0);
+      document.getElementById('team-size').innerText = total;
+
+      // Load withdraw history
+      loadWithdrawHistory();
+
+      // Set up withdraw button
+      withdrawRequestBtn.addEventListener('click', submitWithdrawRequest);
+
+      // Initialize task panel
+      loadNotice();
+      loadTasks();
+      loadJobs();
+      loadUploads();
+
+      // show dashboard by default
+      showPage('dashboardPage');
+    });
+
+    // Admin functions for adding tasks/jobs (for testing)
+    window.__admin = {
+      addTask(taskData) {
+        const tasks = getTasks();
+        tasks.push(taskData);
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+        loadTasks();
+        showToast("টাস্ক যোগ করা হয়েছে!");
+      },
+      
+      addJob(jobData) {
+        const jobs = getJobs();
+        jobs.push(jobData);
+        localStorage.setItem("myjobs", JSON.stringify(jobs));
+        loadJobs();
+        showToast("জব যোগ করা হয়েছে!");
+      },
+      
+      setNotice(text) {
+        localStorage.setItem("notice", text);
+        loadNotice();
+        showToast("নোটিশ আপডেট করা হয়েছে!");
+      },
+      
+      clearAll() {
+        localStorage.removeItem("tasks");
+        localStorage.removeItem("myjobs");
+        localStorage.removeItem("notice");
+        loadTasks();
+        loadJobs();
+        loadNotice();
+        showToast("সব ডাটা ক্লিয়ার করা হয়েছে!");
+      }
+    };
+
+    // Close welcome popup automatically if user already saw it in this session? (optional)
+    // We intentionally show popup only after login/signup as you requested.
+    // Expose helpers for console/testing
+    window.__tash2 = {
+      addToTeam(level, count=1){ const key = `team_lv${level}`; const prev = parseInt(localStorage.getItem(key)||'0',10); localStorage.setItem(key, prev+count); location.reload(); },
+      resetTeam(){ [1,2,3,4].forEach(l=>localStorage.removeItem(`team_lv${l}`)); location.reload(); },
+      addWithdrawHistory(){
+        const testData = {
+          method: 'Bkash',
+          type1: 'Personal',
+          type2: 'Job Withdraw',
+          number: '017XXXXXXXX',
+          amount: '500',
+          status: 'Pending',
+          date: new Date().toLocaleString()
+        };
+        saveWithdrawHistory(testData);
+        loadWithdrawHistory();
+        showToast('Test withdraw history added');
+      }
+    };
+
+  </script>
+</body>
+</html>
